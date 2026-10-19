@@ -1,77 +1,59 @@
-# claudezak
+# claudezak — palavras personalizadas do spinner do Claude Code
 
-Replaces Claude Code's polite spinner verbs and statusline with vulgar alternatives. Two surfaces, two mechanisms:
+Configuração pessoal do indicador de atividade ("spinner") do Claude Code: enquanto o Claude trabalha, em vez de "Thinking…" aparecem palavras como "Lavrando…", "Averbando…" ou "Dando fé…".
 
-- **Spinner verbs** (the gerund next to the spinner during requests, e.g. `Crafting...`) — swapped via Claude Code's built-in `spinnerVerbs` setting.
-- **Statusline** (the persistent bar at the bottom) — driven by a custom command script that prints a random crude phrase.
+A lista fica em `.claude/settings.json`, na chave `spinnerVerbs` (modo `replace`), com 34 palavras:
 
-Examples:
-- Spinner: `Fucking...`, `Pegging...`, `Deepthroating...`
-- Statusline: `Fucking your mom...`, `Counting the toys in your ass...`, `Spitroasting the sprint...`
+| Grupo | Qtde. | Palavras |
+|---|---|---|
+| Pessoais | 9 | Michellando, Michellzando, Mi-pensando, Michellerando, Desmichellando, Remichellando, Michellcubando, Michellnado, Mi-matutando |
+| Cartório (português) | 16 | Lavrando, Averbando, Carimbando, Reconhecendo firma, Protocolando, Autenticando, Selando, Registrando, Escriturando, Arquivando, Apostilando, Matriculando, Conferindo assinaturas, Expedindo certidão, Anotando à margem, Dando fé |
+| Cartório (inglês) | 9 | Notarizing, Stamping, Certifying, Witnessing, Sealing, Filing, Attesting, Apostilling, Recording deeds |
 
-## Install
+## Alcance
+
+- Dentro deste projeto, a lista vale automaticamente.
+- Para valer em todos os projetos do computador, grave a mesma chave em `~/.claude/settings.json` (configuração geral do usuário). A configuração de um projeto prevalece sobre a geral.
+- Reinicie o Claude Code depois de instalar.
+
+## Instalação na configuração geral
+
+### Windows (PowerShell)
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$dir  = Join-Path $HOME '.claude'
+$file = Join-Path $dir 'settings.json'
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+$txt = ''
+if (Test-Path $file) {
+  Copy-Item $file "$file.bak.$(Get-Date -Format yyyyMMdd-HHmmss)"
+  $txt = [IO.File]::ReadAllText($file)
+}
+if ([string]::IsNullOrWhiteSpace($txt)) { $atual = [pscustomobject]@{} } else { $atual = $txt | ConvertFrom-Json }
+$url   = 'https://raw.githubusercontent.com/mmiazr/claudezak/main/.claude/settings.json'
+$fonte = (Invoke-WebRequest -UseBasicParsing $url).Content | ConvertFrom-Json
+$atual | Add-Member -NotePropertyName spinnerVerbs -NotePropertyValue $fonte.spinnerVerbs -Force
+[IO.File]::WriteAllText($file, ($atual | ConvertTo-Json -Depth 100), (New-Object Text.UTF8Encoding $false))
+Write-Host "Palavras gravadas: $(([IO.File]::ReadAllText($file) | ConvertFrom-Json).spinnerVerbs.verbs.Count)"
+```
+
+### macOS ou Linux (requer `jq`)
 
 ```bash
-git clone https://github.com/code-418dotcom/claudezak.git
+git clone https://github.com/mmiazr/claudezak.git
 cd claudezak
-./install.sh              # user-wide → ~/.claude/settings.json
-./install.sh --project /path/to/repo   # project-scoped
-./install.sh --uninstall  # remove (add --project for project scope)
-./install.sh --dry-run    # preview the merged settings.json
+./install.sh              # configuração geral (~/.claude/settings.json)
+./install.sh --dry-run    # mostra o resultado sem gravar
+./install.sh --uninstall  # remove a chave spinnerVerbs
 ```
 
-The installer:
+O instalador altera só a chave `spinnerVerbs` e faz cópia de segurança (`settings.json.bak.<data>`) antes de gravar.
 
-- merges `spinnerVerbs` and `statusLine` into the target `settings.json` via `jq` (other settings are preserved);
-- copies `bin/claudezak-status.sh` to `~/.claude/bin/` (user) or `<project>/bin/` (project), `chmod +x`;
-- backs up `settings.json` as `settings.json.bak.<timestamp>` before any change;
-- is safe to re-run.
+## Desfazer
 
-Requires `jq` on PATH. Restart Claude Code after install.
+Remova a chave `spinnerVerbs` do `settings.json` (ou rode `./install.sh --uninstall`). O Claude Code volta às palavras padrão.
 
-### Manual install
+## Origem
 
-If you'd rather not run the script:
-
-**1. Spinner verbs** — add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user-wide):
-
-```json
-{
-  "spinnerVerbs": {
-    "mode": "replace",
-    "verbs": ["Fucking", "Sucking", "Ramming", "Pounding", "..."]
-  }
-}
-```
-
-`mode: "replace"` uses only your verbs. `mode: "append"` mixes them with the defaults. Copy the full verb list from this project's `.claude/settings.json`.
-
-**2. Statusline** — copy `bin/claudezak-status.sh` somewhere stable (e.g. `~/.claude/bin/`), `chmod +x` it, then:
-
-```json
-{
-  "statusLine": {
-    "type": "command",
-    "command": "/absolute/path/to/claudezak-status.sh"
-  }
-}
-```
-
-Restart Claude Code after either change.
-
-## Customising
-
-- **Spinner verbs**: edit the `spinnerVerbs.verbs` array in `settings.json`. Any string passes — single, two, or three-word gerunds all work (defaults are single-token, hyphenated for compounds).
-- **Statusline templates**: edit the `templates=( ... )` array in `bin/claudezak-status.sh`. Use `%p` (project), `%b` (git branch), `%m` (short model name), `%c` (session cost). Cost-bearing templates are appended automatically when Claude Code provides a cost field.
-
-## How it works
-
-- Spinner verbs use Claude Code's documented `spinnerVerbs` setting (schema: `{mode: "append"|"replace", verbs: string[]}`). On each request, Claude Code picks one verb at random.
-- The statusline is a shell command Claude Code re-runs on activity, piping session JSON (model, cwd, cost, transcript path) on stdin. The script extracts model/project/branch/cost via `jq`, picks a random vulgar template, and substitutes the fields in.
-
-Requires `jq` and `git` on PATH (both standard on most dev machines).
-
-## Caveats
-
-- The statusline does show real session info (model, project name, git branch, cost) — just wrapped in vulgar templates. Examples: `Edging claudezak (main) on Opus`, `Opus has whored itself out for $2.50 in claudezak`. Gimmick + function.
-- A `claude update` won't disturb either mechanism — both live in your settings, not in the binary.
+Fork de [code-418dotcom/claudezak](https://github.com/code-418dotcom/claudezak). Desta versão foram retirados a barra de status e as palavras do projeto original; ficou apenas a lista acima.

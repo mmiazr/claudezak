@@ -4,15 +4,13 @@
 - (none)
 
 ## This Week
-- Decide whether to support a user-supplied phrases/verbs file (`~/.config/claudezak/{verbs,templates}.txt`)
-- Consider an `--uninstall` mode for `new.sh` integration (strip claudezak keys + script from a project)
+- Fechar o PR no repositório original (code-418dotcom/claudezak#1)
 
 ## Backlog
 -
 
 ## Done
-- 050226 — v0: profane statusline script + settings wiring + README
-- 050226 — v1: spinner verbs replaced via built-in `spinnerVerbs` setting (no binary patching needed)
-- 050226 — v2: spinnerVerbs expanded to 120 (20 single + 50 two-word + 50 three-word)
-- 050326 — v3: statusline rewritten to render real session info (model/project/branch/cost) wrapped in profane templates
-- 050326 — v4: integrated into `~/projects/new.sh` (Step 4b prompt + apply block; jq-merges into each new project)
+- 161026 — Palavras pessoais no spinner (PR #1)
+- 161026 — Palavras com tema cartório, PT e EN (PR #2)
+- 161026 — Instalação na configuração geral do Windows
+- 191026 — Limpeza geral: barra de status, skills genéricas, README, memória e instalador
