@@ -1,25 +1,25 @@
 # Memory
 
 ## Now
-- claudezak v1 shipped: spinner verbs + statusline both replaced with profane variants.
+- claudezak é a configuração pessoal do spinner do Claude Code de Michell: 34 palavras (pessoais + tema cartório PT/EN) em `.claude/settings.json` → `spinnerVerbs`.
 
 ## Project Profile
-- Type: Claude Code customisation / gimmick
-- Language: Bash (statusline script) + JSON (settings)
+- Type: configuração do Claude Code
+- Language: JSON (settings) + Bash (install.sh)
 - Framework: none
 
 ## Open Threads
-- Spinner verbs are single-word gerunds; statusline is multi-word phrases. Two separate lists living in different places.
+- PR para o original (code-418dotcom/claudezak#1): fechar, pois o fork divergiu (barra de status e skills genéricas removidas).
 
 ## Recent Decisions
-- 050226 — Use built-in `spinnerVerbs` setting (`{mode, verbs}`) instead of patching `claude.exe`. Code path: `t2H()` reads `x6().spinnerVerbs`. Zero binary modification. Survives `claude update`.
-- 050226 — Statusline rewritten to show real session info (model/project/branch/cost) wrapped in profane templates. Uses `jq` for safe JSON parsing.
-- 050226 — Wired into `~/projects/new.sh` so every Claudify-bootstrapped project inherits claudezak by default (interactive prompt, jq-merge into target settings).
+- 161026 — Lista de palavras substituída pelas pessoais e de cartório (PRs #1 e #2).
+- 161026 — Instalação na configuração geral do Windows feita por PowerShell, gravando só `spinnerVerbs`.
+- 191026 — Limpeza geral: removidos a barra de status obscena (`statusLine` + `bin/claudezak-status.sh`), as 31 categorias de skills genéricas do Claudify e a memória/diário do autor original. `install.sh` passou a tratar só `spinnerVerbs`.
 
 ## Blockers
 - (none)
 
 ## Key Facts
-- Claude Code installs as a Bun-compiled ELF binary at `/home/sjanus/.npm-global/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe` (~237MB).
-- `spinnerVerbs.mode = "replace"` overrides the default verb pool entirely; `"append"` concats.
-- Default verbs (for reference) start: `Accomplishing, Actioning, Actualizing, Architecting, Baking, Beaming, Beboppin', ...` ~100+ entries.
+- `spinnerVerbs.mode = "replace"` substitui as palavras padrão; `"append"` soma às padrão.
+- A configuração do projeto prevalece sobre `~/.claude/settings.json`.
+- O repositório é público: não guardar dados da serventia nem de partes.
