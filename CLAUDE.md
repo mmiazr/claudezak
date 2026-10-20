@@ -5,16 +5,9 @@ Always read `.claude/memory.md` before taking action.
 
 ## Quick Start
 
-**Commands are in `.claude/commands/` — see `.claude/COMMANDS-QUICK-REF.md` for quick reference or `.claude/COMMANDS-SETUP.md` for setup.**
+**Commands are in `.claude/commands/` — see `.claude/command-index.md` for the full catalog.**
 
-From terminal:
-```bash
-./.claude/bin/run-command.sh start      # or 'claudify start' after PATH setup
-./.claude/bin/run-command.sh sync
-./.claude/bin/run-command.sh wrap-up
-```
-
-Or ask Claude in this session:
+Ask Claude in this session:
 - "Execute `/start` for me"
 - "Can you run the wrap-up command?"
 - "Run `/sync`"
